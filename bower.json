@@ -2,6 +2,8 @@
   "name": "polymer-data-example",
   "private": true,
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.1.0"
+    "polymer": "Polymer/polymer#^1.1.0",
+    "iron-ajax": "PolymerElements/iron-ajax#~1.1.1",
+    "iron-selector": "PolymerElements/iron-selector#~1.0.8"
   }
 }

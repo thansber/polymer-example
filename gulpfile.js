@@ -41,7 +41,6 @@ gulp.task('serve', function() {
     // https: true,
     server: {
       baseDir: ['.tmp', 'app'],
-      middleware: [historyApiFallback()],
       routes: {
         '/bower_components': 'bower_components'
       }
@@ -49,8 +48,8 @@ gulp.task('serve', function() {
   });
 
   gulp.watch(['app/**/*.html'], reload);
-  gulp.watch(['app/styles/**/*.css'], ['styles', reload]);
-  gulp.watch(['app/elements/**/*.css'], ['elements', reload]);
-  gulp.watch(['app/{scripts,elements}/**/{*.js,*.html}'], ['jshint']);
+  gulp.watch(['app/styles/**/*.css'], reload);
+  gulp.watch(['app/elements/**/*.css'], reload);
+  gulp.watch(['app/{scripts,elements}/**/*.js'], reload);
   gulp.watch(['app/images/**/*'], reload);
 });
