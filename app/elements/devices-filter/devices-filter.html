@@ -1,0 +1,38 @@
+<script>
+Polymer({
+  is: 'devices-filter',
+
+  properties: {
+    by: String,
+
+    devices: Array,
+
+
+    filteredDevices: {
+      notify: true,
+      type: Array
+    },
+
+    value: String
+  },
+
+  observers: [
+    '_filterMultiple(devices, by, values)',
+    '_filterSingle(devices, by, value)'
+  ],
+
+  _filter: function(devices, by, value) {
+    return devices.filter(function(device) {
+      return device[by] === value;
+    });
+  },
+
+  _filterSingle: function(devices, by, value) {
+    this.set('filteredDevices', this._filter(devices, by, value));
+  },
+
+  _filterMultiple: function(devices, by, values) {
+    this.set('filteredDevices', [].concat.apply([], values.split('|').map(this._filter.bind(this, devices, by))));
+  }
+});
+</script>

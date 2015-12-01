@@ -1,5 +1,8 @@
 
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../devices-api/devices-api.html">
+<link rel="import" href="../devices-list/devices-list.html">
+<link rel="import" href="../devices-menu/devices-menu.html">
 
 <dom-module id="example-app">
   <template>
@@ -8,6 +11,13 @@
         display: block;
       }
     </style>
+
+    <devices-api
+      world="{{ world }}"></devices-api>
+
+    <devices-menu
+      cameras="{{ world.cameras.all }}"></devices-menu>
+
 
   </template>
 
@@ -18,9 +28,6 @@
       Polymer({
         is: 'example-app',
         properties: {
-
-        },
-        ready: function() {
 
         }
       });

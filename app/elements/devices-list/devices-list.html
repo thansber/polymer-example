@@ -1,0 +1,35 @@
+<dom-module id="devices-list">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <ul>
+    <template is="dom-repeat" items="[[ devices ]]" as="device">
+      <li>[[ device.name ]] ([[ device.id ]]) - [[ device.deviceType ]]</li>
+    </template>
+    </ul>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'devices-list',
+      properties: {
+        devices: Array,
+        showOnly: String
+      },
+
+      observers: [
+        '_filter(showOnly)'
+      ],
+
+      _filter: function(showOnly) {
+        if (!showOnly) {
+          return null;
+        }
+      }
+    });
+  </script>
+</dom-module>
