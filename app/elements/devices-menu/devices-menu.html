@@ -1,5 +1,4 @@
 <link rel="import" href="../../bower_components/iron-selector/iron-selector.html">
-<link rel="import" href="../devices-filter/devices-filter.html">
 
 <dom-module id="devices-menu">
   <template>
@@ -22,7 +21,8 @@
       }
     </style>
 
-    <iron-selector attr-for-selected="menu" on-iron-select="_applyFilter">
+    <iron-selector attr-for-selected="menu" on-iron-select="_selectMenu" selected="all">
+      <div menu="all">All Devices ([[ deviceIds.all.length ]])</div>
     <template is="dom-repeat" items="[[ menus ]]" as="menu">
       <div menu$="[[ menu.id ]]">[[ menu.label ]] ([[ menu.count ]])</div>
     </template>
@@ -32,16 +32,9 @@
   <script>
     Polymer({
       is: 'devices-menu',
+
       properties: {
-        cameras: Array,
-        devices: Array,
-
-        filter: {
-          notify: true,
-          type: String
-        },
-
-        lights: Array,
+        deviceIds: Object,
         metadata: {
           type: Object,
           value: function() {
@@ -67,42 +60,38 @@
             return [];
           }
         },
-        sensors: Array,
-        thermostats: Array
+        selectedMenu: {
+          notify: true,
+          type: String
+        }
       },
+
       observers: [
-        '_camerasChanged(cameras)',
-        '_lightsChanged(lights)',
-        '_sensorsChanged(sensors)',
-        '_thermostatsChanged(thermostats)'
+        '_devicesUpdated(deviceIds)'
       ],
 
-      _camerasChanged: function(cameras) {
-        this._menuChanged('cameras', cameras);
+      _devicesUpdated: function(deviceIds) {
+        // clear out all menus
+        this.splice('menus', 0, this.menus.length);
+
+        Object.keys(this.metadata).forEach(function(path) {
+          var metadata = this.metadata[path];
+          var numDevices = deviceIds[path].all.length;
+          if (numDevices) {
+            this.push('menus', {
+              count: numDevices,
+              hasContent: !!numDevices,
+              id: path,
+              label: metadata.label
+            });
+          }
+        }, this);
       },
 
-      _lightsChanged: function(lights) {
-        this._menuChanged('lights', lights);
-      },
-
-      _menuChanged: function(type, data) {
-        var length = this[type].length;
-        var metadata = this.metadata[type];
-        this.push('menus', {
-          count: length,
-          hasContent: !!length,
-          id: type,
-          label: metadata.label
-        });
-      },
-
-      _sensorsChanged: function(sensors) {
-        this._menuChanged('sensors', sensors);
-      },
-
-      _thermostatsChanged: function(thermostats) {
-        this._menuChanged('thermostats', thermostats);
+      _selectMenu: function(e, detail) {
+        this.set('selectedMenu', detail.item.getAttribute('menu'));
       }
+
     });
   </script>
 </dom-module>

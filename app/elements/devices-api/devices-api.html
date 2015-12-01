@@ -20,7 +20,7 @@
 
     var IGNORED_GROUP = '__ignore__';
 
-    var deviceTypeMapping = {
+    var deviceGroupMapping = {
       camera: {
         group: 'camera',
         path: 'cameras'
@@ -31,62 +31,105 @@
       doorLock: {
         group: 'lock',
         path: 'locks'
-      }/*,
-      light: 'light',
-      lightSwitch: 'light',
-      lightDimmer: 'light',
-      lock: 'lock',
-      panel: 'panel',
-      peripheral: 'peripheral',
-      sensor: 'sensor',
-      thermostat: 'thermostat'*/
+      },
+      light: {
+        group: 'light',
+        path: 'lights'
+      },
+      lightSwitch: {
+        group: 'light',
+        path: 'lights'
+      },
+      lightDimmer: {
+        group: 'light',
+        path: 'lights'
+      },
+      lock: {
+        group: 'lock',
+        path: 'locks'
+      },
+      panel: {
+        group: 'panel',
+        path: 'panels'
+      },
+      peripheral: {
+        group: 'peripheral',
+        path: 'peripherals'
+      },
+      sensor: {
+        group: 'sensor',
+        path: 'sensors'
+      },
+      thermostat: {
+        group: 'thermostat',
+        path: 'thermostats'
+      }
     };
 
     Polymer({
       is: 'devices-api',
       properties: {
         devicesResponse: Object,
-        world: {
+        devices: {
           notify: true,
-          type: Object,
-          value: function() {
-            return {
-              cameras: {
-                all: []
-              },
-              devices: {
-                all: []
-              },
-              lights: {
-                all: []
-              },
-              locks: {
-                all: []
-              },
-              sensors: {
-                all: []
-              }
-            };
-          }
+          type: Array
+        },
+        deviceIds: {
+          notify: true,
+          type: Object
         }
       },
 
       observers: [
-        '_devicesChanged(world.devices.all)',
-        '_parseDeviceResponse(devicesResponse)'
+        '_parseDeviceResponse(devicesResponse)',
+        '_parseDeviceIds(devices)'
       ],
 
-      _devicesChanged: function(devices) {
-        (devices || []).forEach(function(device) {
-          var mapping = deviceTypeMapping[device.deviceType];
-          if (mapping && mapping.group !== IGNORED_GROUP) {
-            this.push('world.' + mapping.path + '.all', device);
+      _parseDeviceIds: function(devices) {
+        var deviceIds = {
+          all: [],
+          cameras: {
+            all: []
+          },
+          lights: {
+            all: []
+          },
+          locks: {
+            all: []
+          },
+          panels: {
+            all: []
+          },
+          peripherals: {
+            all: []
+          },
+          sensors: {
+            all: []
+          },
+          thermostats: {
+            all: []
           }
-        }, this);
+        };
+        devices.forEach(function(device) {
+          var mapping = deviceGroupMapping[device.deviceType];
+          deviceIds.all.push(device.id);
+
+          if (mapping && mapping.path) {
+            deviceIds[mapping.path].all.push(device.id);
+          }
+        });
+        this.set('deviceIds', deviceIds);
       },
 
       _parseDeviceResponse: function(response) {
-        this.set('world.devices.all', response._embedded.devices);
+        var devices = response._embedded.devices;
+        devices.forEach(function(device) {
+          var mapping = deviceGroupMapping[device.deviceType];
+          if (mapping) {
+            device.group = mapping.group;
+          }
+        });
+        this.set('devices', devices);
       }
     });
   }());

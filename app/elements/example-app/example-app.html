@@ -13,11 +13,17 @@
     </style>
 
     <devices-api
-      world="{{ world }}"></devices-api>
+      devices="{{ devices }}"
+      device-ids="{{ deviceIds }}"></devices-api>
 
     <devices-menu
-      cameras="{{ world.cameras.all }}"></devices-menu>
+      device-ids="[[ deviceIds ]]"
+      selected-menu="{{ menu }}"></devices-menu>
 
+    <devices-list
+      devices="{{ devices }}"
+      deviceIds="{{ deviceIds }}"
+      show-only="{{ menu }}"></devices-list>
 
   </template>
 
