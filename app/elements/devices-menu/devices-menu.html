@@ -39,17 +39,25 @@
           type: Object,
           value: function() {
             return {
-              cameras: {
-                label: 'Cameras'
+              camera: {
+                label: 'Cameras',
+                path: 'allCameras'
               },
-              lights: {
-                label: 'Lights'
+              detector: {
+                label: 'Detectors',
+                path: 'sensorsThatAreDetectors'
               },
-              sensors: {
-                label: 'Sensors'
+              light: {
+                label: 'Lights',
+                path: 'allLights'
               },
-              thermostats: {
-                label: 'Global Thermonuclear War'
+              sensor: {
+                label: 'Sensors',
+                path: 'sensorsThatAreNotDetectors'
+              },
+              thermostat: {
+                label: 'Global Thermonuclear War',
+                path: 'allThermostats'
               }
             };
           }
@@ -74,14 +82,14 @@
         // clear out all menus
         this.splice('menus', 0, this.menus.length);
 
-        Object.keys(this.metadata).forEach(function(path) {
-          var metadata = this.metadata[path];
-          var numDevices = deviceIds[path].all.length;
+        Object.keys(this.metadata).forEach(function(group) {
+          var metadata = this.metadata[group];
+          var numDevices = this.get(metadata.path, this.deviceIds).length;
           if (numDevices) {
             this.push('menus', {
               count: numDevices,
               hasContent: !!numDevices,
-              id: path,
+              id: group,
               label: metadata.label
             });
           }

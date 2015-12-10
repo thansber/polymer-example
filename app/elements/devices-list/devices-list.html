@@ -1,3 +1,5 @@
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+
 <dom-module id="devices-list">
   <template>
     <style>
@@ -8,11 +10,23 @@
       ul {
         list-style-type: none;
       }
+
+      iron-icon {
+        cursor: pointer;
+      }
     </style>
 
     <ul>
-    <template is="dom-repeat" items="[[ devices ]]" as="device">
-      <li>[[ device.name ]] ([[ device.id ]]) - [[ device.deviceType ]]</li>
+    <template
+      is="dom-repeat"
+      items="[[ devices ]]"
+      as="device"
+      filter="[[ _filter(showOnly) ]]">
+      <li on-tap="_editThis" device-id$="[[ device.id ]]">
+        <input editable value="" hidden />
+        <span name>[[ device.name ]]</span> ([[ device.id ]]) - [[ device.deviceType ]] - [[ device.subGroup ]]
+        <iron-icon icon="check" save editable hidden></iron-icon>
+      </li>
     </template>
     </ul>
 
@@ -22,6 +36,7 @@
       is: 'devices-list',
       properties: {
         devices: Array,
+        filterMethod: Object,
         showOnly: String
       },
 
@@ -29,10 +44,35 @@
         '_filter(showOnly)'
       ],
 
+      _editThis: function(e) {
+        if (e.target.hasAttribute('save')) {
+          this.fire('update-name', {
+            id: e.currentTarget.getAttribute('device-id'),
+            name: e.currentTarget.querySelector('input').value
+          });
+        }
+
+        Polymer.dom(this.root).querySelectorAll('[editable]').forEach(function(editable) {
+          this.toggleAttribute('hidden', true, editable);
+        }, this);
+        this.toggleAttribute('hidden', false, this.$$('[name][hidden]'));
+
+        Polymer.dom(e.currentTarget).querySelectorAll('[editable]').forEach(function(editable) {
+          this.toggleAttribute('hidden', false, editable);
+        }, this);
+        this.toggleAttribute('hidden', true, e.currentTarget.querySelector('[name]'));
+
+        e.currentTarget.querySelector('input').value = e.model.device.name;
+      },
+
       _filter: function(showOnly) {
-        if (!showOnly) {
+        if (/all/.test(showOnly)) {
           return null;
         }
+
+        return function(device) {
+          return device.subGroup === showOnly;
+        };
       }
     });
   </script>

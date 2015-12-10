@@ -1,0 +1,56 @@
+<script>
+(function(scope) {
+  scope.XH = scope.XH || {};
+
+  var IGNORED_GROUP = '__ignore__';
+  var typesToGroup = {
+    camera: {
+      allPath: 'allCameras',
+      group: 'camera'
+    },
+    cameraMotion: {
+      group: IGNORED_GROUP
+    },
+    doorLock: {
+      allPath: 'allLocks',
+      group: 'lock'
+    },
+    light: {
+      allPath: 'allLights',
+      group: 'light'
+    },
+    lightSwitch: {
+      allPath: 'allLights',
+      group: 'light'
+    },
+    lightDimmer: {
+      allPath: 'allLights',
+      group: 'light'
+    },
+    lock: {
+      allPath: 'allLocks',
+      group: 'lock'
+    },
+    panel: {
+      allPath: 'allPanels',
+      group: 'panel'
+    },
+    peripheral: {
+      allPath: 'allPeripherals',
+      group: 'peripheral'
+    },
+    sensor: {
+      allPath: 'allSensors',
+      group: 'sensor'
+    },
+    thermostat: {
+      allPath: 'allThermostats',
+      group: 'thermostat'
+    }
+  };
+
+  scope.XH.DeviceMappingBehavior = {
+    typesToGroup: typesToGroup
+  };
+}(window));
+</script>

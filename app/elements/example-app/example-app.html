@@ -14,7 +14,8 @@
 
     <devices-api
       devices="{{ devices }}"
-      device-ids="{{ deviceIds }}"></devices-api>
+      device-ids="{{ deviceIds }}"
+      id="api"></devices-api>
 
     <devices-menu
       device-ids="[[ deviceIds ]]"
@@ -22,7 +23,6 @@
 
     <devices-list
       devices="{{ devices }}"
-      deviceIds="{{ deviceIds }}"
       show-only="{{ menu }}"></devices-list>
 
   </template>
@@ -35,6 +35,14 @@
         is: 'example-app',
         properties: {
 
+        },
+
+        listeners: {
+          'update-name': 'updateName'
+        },
+
+        updateName: function(e, detail) {
+          this.$.api.updateName(detail);
         }
       });
     })();

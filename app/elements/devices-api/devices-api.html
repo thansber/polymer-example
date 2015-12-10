@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../device-mapping/device-mapping-behavior.html">
 
 <dom-module id="devices-api">
   <template>
@@ -18,56 +19,19 @@
   <script>
   (function() {
 
-    var IGNORED_GROUP = '__ignore__';
+    var base = {};
 
-    var deviceGroupMapping = {
-      camera: {
-        group: 'camera',
-        path: 'cameras'
-      },
-      cameraMotion: {
-        group: IGNORED_GROUP
-      },
-      doorLock: {
-        group: 'lock',
-        path: 'locks'
-      },
-      light: {
-        group: 'light',
-        path: 'lights'
-      },
-      lightSwitch: {
-        group: 'light',
-        path: 'lights'
-      },
-      lightDimmer: {
-        group: 'light',
-        path: 'lights'
-      },
-      lock: {
-        group: 'lock',
-        path: 'locks'
-      },
-      panel: {
-        group: 'panel',
-        path: 'panels'
-      },
-      peripheral: {
-        group: 'peripheral',
-        path: 'peripherals'
-      },
-      sensor: {
-        group: 'sensor',
-        path: 'sensors'
-      },
-      thermostat: {
-        group: 'thermostat',
-        path: 'thermostats'
-      }
-    };
+    Object.defineProperty(base, 'devices', {
+
+    })
 
     Polymer({
       is: 'devices-api',
+
+      behaviors: [
+        XH.DeviceMappingBehavior
+      ],
+
       properties: {
         devicesResponse: Object,
         devices: {
@@ -85,51 +49,74 @@
         '_parseDeviceIds(devices)'
       ],
 
+      updateName: function(detail) {
+        var devicePath = 'devices.' + this._findDeviceIndex(detail.id) + '.name';
+        this.set(devicePath, detail.name);
+      },
+
+      _findDeviceIndex: function(id) {
+        return this.devices.findIndex(function(device) {
+          return device.id === id;
+        });
+      },
+
+      _isDetector: function(device) {
+        return (/sensor/.test(device.group)
+          && device.properties.isBypassed === undefined)
+          || /glassbreak/i.test(device.properties.type);
+      },
+
       _parseDeviceIds: function(devices) {
         var deviceIds = {
           all: [],
-          cameras: {
-            all: []
-          },
-          lights: {
-            all: []
-          },
-          locks: {
-            all: []
-          },
-          panels: {
-            all: []
-          },
-          peripherals: {
-            all: []
-          },
-          sensors: {
-            all: []
-          },
-          thermostats: {
-            all: []
-          }
+          allCameras: [],
+          allLights: [],
+          allLocks: [],
+          allPanels: [],
+          allPeripherals: [],
+          allSensors: [],
+          allThermostats: [],
+          sensorsThatAreDetectors: [],
+          sensorsThatAreNotDetectors: []
         };
+
         devices.forEach(function(device) {
-          var mapping = deviceGroupMapping[device.deviceType];
           deviceIds.all.push(device.id);
 
-          if (mapping && mapping.path) {
-            deviceIds[mapping.path].all.push(device.id);
-          }
-        });
+          this._splitByType(device, deviceIds);
+          this._splitSensors(device, deviceIds);
+        }, this);
+
         this.set('deviceIds', deviceIds);
       },
 
       _parseDeviceResponse: function(response) {
         var devices = response._embedded.devices;
         devices.forEach(function(device) {
-          var mapping = deviceGroupMapping[device.deviceType];
+          var mapping = this.typesToGroup[device.deviceType];
           if (mapping) {
             device.group = mapping.group;
+            device.subGroup = this._isDetector(device) ? 'detector' : device.group;
           }
-        });
+        }, this);
         this.set('devices', devices);
+      },
+
+      _splitByType: function(device, ids) {
+        var mapping = this.typesToGroup[device.deviceType];
+        if (!mapping || !mapping.allPath) {
+          return;
+        }
+
+        ids[mapping.allPath].push(device.id);
+      },
+
+      _splitSensors: function(device, ids) {
+        if (/detector/.test(device.subGroup)) {
+          ids.sensorsThatAreDetectors.push(device.id);
+        } else if (/sensor/.test(device.subGroup)) {
+          ids.sensorsThatAreNotDetectors.push(device.id);
+        }
       }
     });
   }());
