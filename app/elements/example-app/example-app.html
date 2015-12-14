@@ -38,7 +38,12 @@
         },
 
         listeners: {
+          'xh-event': 'handleEvent',
           'update-name': 'updateName'
+        },
+
+        handleEvent: function(e, detail) {
+          this.$.api.processEvent(detail);
         },
 
         updateName: function(e, detail) {

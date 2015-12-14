@@ -49,6 +49,13 @@
         '_parseDeviceIds(devices)'
       ],
 
+      processEvent: function(detail) {
+        if (detail.action === 'lockToggle') {
+          var devicePath = 'devices.' + this._findDeviceIndex(detail.deviceId) + '.properties.locked';
+          this.set(devicePath, detail.locked);
+        }
+      },
+
       updateName: function(detail) {
         var devicePath = 'devices.' + this._findDeviceIndex(detail.id) + '.name';
         this.set(devicePath, detail.name);

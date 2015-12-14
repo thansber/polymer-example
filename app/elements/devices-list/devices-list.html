@@ -22,10 +22,14 @@
       items="[[ devices ]]"
       as="device"
       filter="[[ _filter(showOnly) ]]">
-      <li on-tap="_editThis" device-id$="[[ device.id ]]">
+      <li device-id$="[[ device.id ]]">
         <input editable value="" hidden />
         <span name>[[ device.name ]]</span> ([[ device.id ]]) - [[ device.deviceType ]] - [[ device.subGroup ]]
         <iron-icon icon="check" save editable hidden></iron-icon>
+        <iron-icon
+          icon="[[ _computeLock(device, device.properties.locked) ]]"
+          hidden$="[[ !_isLock(device) ]]"
+          on-tap="_toggleLock"></iron-icon>
       </li>
     </template>
     </ul>
@@ -43,6 +47,12 @@
       observers: [
         '_filter(showOnly)'
       ],
+
+      _computeLock: function(device, isLocked) {
+        if (this._isLock(device)) {
+          return isLocked ? 'lock' : 'lock-open';
+        }
+      },
 
       _editThis: function(e) {
         if (e.target.hasAttribute('save')) {
@@ -73,6 +83,19 @@
         return function(device) {
           return device.subGroup === showOnly;
         };
+      },
+
+      _isLock: function(device) {
+        return /lock/.test(device.group);
+      },
+
+      _toggleLock: function(e) {
+        var device = e.model.device;
+        this.fire('xh-event', {
+          action: 'lockToggle',
+          deviceId: device.id,
+          locked: !device.properties.locked
+        })
       }
     });
   </script>
